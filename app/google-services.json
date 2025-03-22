@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "134105358466",
+    "project_id": "surprise-ce3d3",
+    "storage_bucket": "surprise-ce3d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:134105358466:android:e370f2afdf2d8dc079549b",
+        "android_client_info": {
+          "package_name": "com.example.surprise"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTeocN6yaPwlC3pZaqvFSPS0KQo0Vi2Tk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
