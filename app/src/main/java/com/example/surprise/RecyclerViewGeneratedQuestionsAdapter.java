@@ -15,43 +15,48 @@ import java.util.ArrayList;
 public class RecyclerViewGeneratedQuestionsAdapter extends RecyclerView.Adapter<RecyclerViewGeneratedQuestionsAdapter.ViewHolder> {
     ArrayList<Question> questions;
     Context context;
-    RecyclerViewGeneratedQuestionsAdapter(ArrayList<Question> questions,Context context){
+    QuestionRegenerateListener regenerateListener;
+
+    RecyclerViewGeneratedQuestionsAdapter(ArrayList<Question> questions, Context context, QuestionRegenerateListener listener) {
         this.questions = questions;
         this.context = context;
-
+        this.regenerateListener = listener;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.generated_question,parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.generated_question, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.regenerate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO
-                //Send  a request to the server to regenerate this question and update the questions array
+        final int pos = position;
+        holder.regenerate.setOnClickListener(v -> {
+            if (regenerateListener != null) {
+                regenerateListener.onRegenerateQuestion(pos);
             }
         });
+
         holder.question.setText(questions.get(position).question);
         holder.option1.setText("A: " + questions.get(position).option1);
         holder.option2.setText("B: " + questions.get(position).option2);
         holder.option3.setText("C: " + questions.get(position).option3);
         holder.option4.setText("D: " + questions.get(position).option4);
-        holder.correctOption.setText(questions.get(position).correctOption);
+        holder.correctOption.setText("Correct Answer: " + questions.get(position).correctOption);
     }
 
     @Override
     public int getItemCount() {
         return questions.size();
     }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView question;
-        TextView option1,option2,option3,option4,correctOption;
+        TextView option1, option2, option3, option4, correctOption;
         ImageButton regenerate;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             question = itemView.findViewById(R.id.generatedQuestionDescription);

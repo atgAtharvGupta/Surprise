@@ -47,6 +47,7 @@ dependencies {
     implementation libs.credentials.play.services.auth
     implementation libs.googleid
     implementation libs.lottie
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 }
 dependencies {
     implementation libs.firebase.database
