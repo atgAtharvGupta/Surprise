@@ -101,9 +101,11 @@ public class RecycleViewQuestionsAdapter extends RecyclerView.Adapter<RecycleVie
             });
         }
     }
-    public void submit(String id, String pass) {
+    public void submit(String id, String pass,int pauseCount,int resumeCount) {
         //TODO
         //WRITE CODE TO SUBMIT THE ANSWERS
+        //TODO
+        //Also deduct marks based on the number of times student joined the test
         System.out.println("Submitting test for ID: " + id + " with Password: " + pass);
         for (int i = 0; i < questionArrayList.size(); i++) {
             String questionText = questionArrayList.get(i).question;

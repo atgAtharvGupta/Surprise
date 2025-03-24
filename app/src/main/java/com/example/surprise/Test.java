@@ -4,7 +4,9 @@ import android.content.Context;
 import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,8 +21,20 @@ import java.util.ArrayList;
 
 public class Test extends AppCompatActivity implements  Submit.OnSubmitCalled {
     static ArrayList<Question> questionArrayList = new ArrayList<>();
+    private int pauseCount,resumeCount;
     public void onSubmitCalled(){
         finish();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        pauseCount++;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        resumeCount++;
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +42,10 @@ public class Test extends AppCompatActivity implements  Submit.OnSubmitCalled {
 
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
+        //prevent screenshots
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+
         setContentView(R.layout.activity_test);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -35,6 +53,8 @@ public class Test extends AppCompatActivity implements  Submit.OnSubmitCalled {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
 
         Button testAcknowledge = findViewById(R.id.testAcknowledge);
         testAcknowledge.setOnClickListener(new View.OnClickListener() {
@@ -53,11 +73,10 @@ public class Test extends AppCompatActivity implements  Submit.OnSubmitCalled {
         String testEndTime = "18:26"; // Get this from server (24-hour format)
 
         //TODO
-        for (int i = 0; i < 10; i++) {
-            questionArrayList.add(new Question(
-                    "Does true equality exist?",
-                    "no", "yes", "yesn't", "arguable", "a"
-            ));
+        System.out.println("DEBUG");
+        System.out.println(questionArrayList.size());
+        for (int i = 0; i < questionArrayList.size(); i++) {
+            System.out.println(questionArrayList.get(i).question);
         }
 
         RecyclerView recyclerViewQuestions = findViewById(R.id.testQuestionsRecyclerView);
@@ -69,7 +88,7 @@ public class Test extends AppCompatActivity implements  Submit.OnSubmitCalled {
         int endMinute = Integer.parseInt(testEndTime.substring(3, 5));
 
         // Start timer thread
-        Submit submitThread = new Submit(endHour, endMinute, id, password, recycleViewQuestionsAdapter,this,this);
+        Submit submitThread = new Submit(endHour, endMinute, id, password, recycleViewQuestionsAdapter,this,this,pauseCount,resumeCount);
         submitThread.start();
     }
 }
@@ -83,11 +102,12 @@ class Submit extends Thread {
     private final int targetMinute;
     private final String id;
     private final String password;
+    private int pauseCount,resumeCount;
     private final RecycleViewQuestionsAdapter adapter;
     private final Context context;
     private final OnSubmitCalled onSubmitCalled;
 
-    Submit(int hour, int minute, String id, String password, RecycleViewQuestionsAdapter adapter,OnSubmitCalled onSubmitCalled,Context context) {
+    Submit(int hour, int minute, String id, String password, RecycleViewQuestionsAdapter adapter,OnSubmitCalled onSubmitCalled,Context context,int pauseCount,int resumeCount) {
         this.onSubmitCalled = onSubmitCalled;
         this.targetHour = hour;
         this.targetMinute = minute;
@@ -104,11 +124,15 @@ class Submit extends Thread {
             int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
             int currentMinute = calendar.get(Calendar.MINUTE);
 
-            if (currentHour == targetHour && currentMinute == targetMinute) {
-                adapter.submit(id, password);
+            //Submit answers OR response every one second
+            adapter.submit(id, password,pauseCount,resumeCount);
+
+
+            if (   (currentHour == targetHour && currentMinute == targetMinute)    ) {
                 onSubmitCalled.onSubmitCalled();
                 break;
             }
+
             // checks every one second
             try {
                 Thread.sleep(1000);  // Sleep for 1 second
